@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import {assert, test, vi} from "vitest";
 import {sql} from "./sql.js";
 
