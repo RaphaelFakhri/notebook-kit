@@ -560,6 +560,7 @@
 
     - *fragment*.flat(*dialect*) - returns the fragment with nested fragments, [views](#sql-view), and [variants](#sql-variant-variants) resolved for a SQL *dialect* (the flavor of SQL of a database, such as `duckdb` or `mysql`)
     - *fragment*.query(*database*) - flattens the fragment for *database*, and runs it
+    - *fragment*.toDialect(*dialect*) - returns the fragment with each variant replaced by its value for *dialect*
     - *fragment*.toString() - returns the SQL text of the flattened fragment (for the default dialect), with `?` for each value
   </script>
   <script id="67" type="module" pinned="">
@@ -568,7 +569,7 @@
   <script id="68" type="text/markdown">
     ### sql.view\`…\`
 
-    Returns a SQL _view_: a fragment that stands for a query, and can be used like a table in other queries. When a query is flattened, each view it uses becomes a named subquery in a `WITH` clause (a [common table expression](https://duckdb.org/docs/stable/sql/query_syntax/with)), named `_1`, `_2`, and so on. A view used several times is defined once, views can use other views, and an existing `WITH` clause is extended.
+    Returns a SQL _view_: a fragment that can be used like a table in other queries. When a query is flattened, the view becomes a named subquery in its `WITH` clause (a [common table expression](https://duckdb.org/docs/stable/sql/query_syntax/with)). See [Composing SQL](https://observablehq.com/@observablehq/composing-sql) for details.
   </script>
   <script id="69" type="module" pinned="">
     const adelieView = sql.view`SELECT * FROM penguins WHERE species = 'Adelie'`;
@@ -663,7 +664,7 @@
   <script id="84" type="text/markdown">
     ### htl
 
-    [Hypertext Literal](https://github.com/observablehq/htl) is a Module that creates HTML and SVG elements in a safe fashion. Interpolated values are escaped according to their context: a string is inserted as text, not as HTML; DOM nodes and arrays of nodes are inserted as they are. In attributes, you can interpolate strings, numbers, booleans, objects for `style`, and functions for event handlers such as `onclick`.
+    The `html` and `svg` template literals of [Hypertext Literal](https://github.com/observablehq/htl) (`htl`) create HTML and SVG elements safely. Interpolated values are escaped according to their context: a string is inserted as text, not as HTML; DOM nodes and arrays of nodes are inserted as they are. In attributes, you can interpolate strings, numbers, booleans, objects for `style`, and functions for event handlers such as `onclick`.
 
     If the template has several top-level nodes, `html` wraps them in a `span`, and `svg` in a `g`. To get a [document fragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) instead, use `html.fragment` or `svg.fragment`.
   </script>
@@ -707,7 +708,7 @@
 
     ## Recommended libraries
 
-    The libraries below are available without an explicit import. Most are loaded from [jsDelivr](https://www.jsdelivr.com/) and get the latest version. To use another version or another library, do an explicit `import * as Plot from "npm:@observablehq/plot@0.6"`.
+    The libraries below are available without an explicit import. Most are loaded from [jsDelivr](https://www.jsdelivr.com/) and get the latest version. To use another version or another library, import it explicitly, as in `import * as Plot from "npm:@observablehq/plot@0.6"`.
 
     | Name | Library |
     | - | - |
