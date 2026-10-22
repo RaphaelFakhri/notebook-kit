@@ -804,7 +804,7 @@
     - `width` is the width of the `main` element instead of the `body`, and updates when the element is resized, not only the window.
     - `html` and `svg` use Hypertext Literal, which escapes interpolated strings; they used to insert strings as HTML.
     - `md` uses markdown-it instead of Marked, and usually returns a `div`.
-    - `FileAttachment` paths are relative to the notebook, and must be literal strings. *file*.href replaces *file*.url(). *file*.dsv(), *file*.parquet(), *file*.arquero(), *file*.text(*encoding*), *file*.lastModified, and *file*.size are new. *file*.arrow() returns a Flechette table instead of an Apache Arrow JS table, and has no `version` option.
+    - `FileAttachment` paths are relative to the notebook, and must be literal strings. *file*.href is new; prefer it to *file*.url(). *file*.dsv(), *file*.parquet(), *file*.arquero(), *file*.text(*encoding*), *file*.lastModified, and *file*.size are new. *file*.arrow() returns a Flechette table instead of an Apache Arrow JS table, and has no `version` option.
     - `DOM`, `Files`, and `Promises` are [deprecated](#deprecated).
   </script>
 </notebook>
