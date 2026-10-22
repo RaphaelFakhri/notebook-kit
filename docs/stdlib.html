@@ -488,7 +488,11 @@
 
     If DuckDB cannot read the values of a CSV file, it loads all columns as strings. Parquet files are exposed as views: DuckDB reads them when a query uses them.
 
-    *config* is passed to DuckDB-Wasm. By default, the client converts decimals and big integers to numbers (`query.castDecimalToDouble`, `query.castBigIntToDouble`), converts timestamps to dates (`query.castTimestampToDate`), and downloads each file completely (`filesystem.forceFullHTTPReads`); set this option to false so that DuckDB fetches only the parts of a Parquet file that a query needs, with range requests.
+    *config* is passed to DuckDB-Wasm. By default, the client converts decimals and big integers to numbers (`query.castDecimalToDouble`, `query.castBigIntToDouble`), converts timestamps to dates (`query.castTimestampToDate`), and downloads each file completely (`filesystem.forceFullHTTPReads`). To let DuckDB fetch only the parts of a Parquet file that a query needs, with range requests, set this option to false:
+
+    ```js
+    const db = DuckDBClient.of(sources, {filesystem: {forceFullHTTPReads: false}});
+    ```
   </script>
   <script id="57" type="module" pinned="">
     const db = DuckDBClient.of({penguins: FileAttachment("ex/data/penguins.csv")});
