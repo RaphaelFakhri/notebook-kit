@@ -330,7 +330,7 @@
     - **typed** - how to convert values, which are strings in the file:
       - false (the default) - values remain strings
       - true - values are converted with [d3.autoType](https://d3js.org/d3-dsv#autoType), row by row
-      - `"auto"` - each column gets one type, based on its first 100 rows: boolean, number, or date if at least 90% of its non-empty values have that type, and string otherwise. With **array**, `"auto"` is the same as true.
+      - `"auto"` - each column gets one type, based on its first 100 rows: boolean, number, or date if at least 90% of its non-empty values have that type, and string otherwise. If **array** is true, `"auto"` falls back to d3.autoType, row by row.
 
     Only convert types if the data is compatible: for example, d3.autoType turns ZIP codes such as `01234` into numbers.
   </script>
@@ -454,7 +454,7 @@
 
     Returns a client for the database *name*, either configured in `.observable/databases.json` next to the notebook, or one that needs no configuration, such as `duckdb`; see [Database connectors](./databases). Like `FileAttachment`, it requires a literal string. SQL cells use this function and set *options*; you can omit them.
 
-    *client*.sql\`*query*\` returns a promise of an array of objects, one per row, with a `schema` property (the name and type of each column) and a `date` property (when the query ran).
+    In Notebook Kit, *client*.sql\`*query*\` returns a promise of an array of objects, one per row, with a `schema` property (the name and type of each column) and a `date` property (when the query ran). On hosted Observable, it returns a Flechette table instead (see below).
 
     ```js
     const warehouse = DatabaseClient("duckdb");
@@ -488,7 +488,7 @@
 
     If DuckDB cannot read the values of a CSV file, it loads all columns as strings. Parquet files are exposed as views: DuckDB reads them when a query uses them.
 
-    *config* is passed to DuckDB-Wasm. By default, the client converts decimals and big integers to numbers (`query.castDecimalToDouble`, `query.castBigIntToDouble`), converts timestamps to dates (`query.castTimestampToDate`), and downloads each file completely (`filesystem.forceFullHTTPReads`); if that option is set to false, only files of known size under 50MB are loaded upfront, and larger files are consumed with range requests.
+    *config* is passed to DuckDB-Wasm. By default, the client converts decimals and big integers to numbers (`query.castDecimalToDouble`, `query.castBigIntToDouble`), converts timestamps to dates (`query.castTimestampToDate`), and downloads each file completely (`filesystem.forceFullHTTPReads`); set this option to false so that DuckDB fetches only the parts of a Parquet file that a query needs, with range requests.
   </script>
   <script id="57" type="module" pinned="">
     const db = DuckDBClient.of({penguins: FileAttachment("ex/data/penguins.csv")});
@@ -532,7 +532,7 @@
   <script id="62" type="text/markdown">
     The variable can be any object with a `sql` tagged template function. Otherwise, the SQL cell loads its value into a new DuckDB-Wasm database, as a table with the variable's name: for example, `database="var:penguins"` queries the `penguins` [sample dataset](#sample-datasets). This database is recreated each time the cell runs; to run several queries on the same data, use `DuckDBClient.of`.
 
-    A SQL cell's **output** is what its client returns: an Apache Arrow table for `DuckDBClient`, and an array of objects for database connectors.
+    A SQL cell's **output** is what its client returns: an Apache Arrow table for `DuckDBClient`, and, for database connectors, an array of objects in Notebook Kit or a Flechette table on hosted Observable.
 
     ### sql\`…\`
 
@@ -573,7 +573,7 @@
     String(sql`SELECT island, COUNT(*) AS count FROM ${adelieView} GROUP BY island`)
   </script>
   <script id="71" type="text/markdown">
-    *view*.bind(*database*) returns a view attached to *database*. A view can be bound only once.
+    *view*.bind(*database*) returns a view attached to *database*; run it with *view*.query(). A view can be bound only once.
 
     #### SQL view cells
 
@@ -603,7 +603,7 @@
     Inputs.table(await adelie.query())
   </script>
   <script id="77" type="text/markdown">
-    A view used in a query for another database runs on that database: only its SQL text is copied.
+    A query that uses a bound view must run on the same database.
 
     ### sql.ident(*name*)
 
@@ -611,12 +611,14 @@
 
     ### sql.text(*value*)
 
-    Returns a fragment for the SQL string *value*, quoted for the database. A string interpolated with `$\{…}` is sent to the database alongside the query, and appears as `?` in the SQL text; with `sql.text`, the string is baked into the SQL text itself, for example to build the list of an `IN (…)` clause.
+    Returns a fragment for the SQL string *value*, quoted for the database. A string interpolated with `$\{…}` is sent to the database alongside the query, and appears as `?` in the SQL text; with `sql.text`, the string is baked into the SQL text itself. Use it where the database does not accept a parameter, such as in DuckDB's `PIVOT … IN (…)`.
   </script>
   <script id="78" type="module" pinned="">
     const speciesList = ["Adelie", "Gentoo"].map(sql.text).reduce((a, b) => sql`${a}, ${b}`);
+    const pivot = sql`PIVOT penguins ON ${sql.ident("species")} IN (${speciesList}) USING COUNT(*) GROUP BY island`;
 
-    display(String(sql`SELECT ${sql.ident("body_mass_g")} FROM penguins WHERE species IN (${speciesList})`));
+    display(String(pivot));
+    display(Inputs.table(await pivot.query(db)));
   </script>
   <script id="79" type="text/markdown">
     ### sql.variant(*variants*)
@@ -714,7 +716,7 @@
     | `DuckDBClient` | [DuckDB client](#duck-db-client-of-sources-config) |
     | `echarts` | [Apache ECharts](https://echarts.apache.org/) |
     | `Flechette` | [Flechette](https://idl.uw.edu/flechette/) |
-    | `htl`, `html`, `svg` | [Hypertext Literal](#html-and-svg) |
+    | `htl`, `html`, `svg` | [Hypertext Literal](#htl) |
     | `Inputs` | [Observable Inputs](https://github.com/observablehq/inputs), with its stylesheet |
     | `L` | [Leaflet](https://leafletjs.com/), with its stylesheet |
     | `mapboxgl` | [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/), with its stylesheet |
@@ -785,7 +787,7 @@
 
     ## Differences from the standard library (2018)
 
-    For authors familiar with the [previous stlib](https://github.com/observablehq/stdlib):
+    For authors familiar with the [previous standard library](https://github.com/observablehq/stdlib):
 
     - `display` and `view` are new.
     - `dark`, `DatabaseClient`, `Interpreter`, `sql`, `duckdb`, `echarts`, `Flechette`, `mapboxgl`, `React`, and `ReactDOM` are new.
