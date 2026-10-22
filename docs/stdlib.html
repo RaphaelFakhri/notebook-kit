@@ -654,7 +654,7 @@
 
     ### md\`…\`
 
-    Renders [CommonMark](https://commonmark.org/) text with [markdown-it](https://github.com/markdown-it/markdown-it). HTML is allowed, URLs become links, and quotes and dashes become typographic quotes and dashes. Headings of level 2 and 3 get an anchor link. Code blocks with a language, such as `js`, are highlighted.
+    Renders [CommonMark](https://commonmark.org/) text with [markdown-it](https://github.com/markdown-it/markdown-it). HTML is allowed, but Markdown inside an HTML block is not rendered: `<p>**bold**</p>` shows the asterisks. URLs become links, and quotes and dashes become typographic quotes and dashes. Headings of level 2 and 3 get an anchor link. Code blocks with a language, such as `js`, are highlighted.
 
     Interpolated DOM nodes are inserted as they are. An interpolated array can contain strings, rendered as Markdown, and DOM nodes. Other values become strings, rendered as Markdown without escaping. `md` returns a `div`, or the result itself if it is a single node, such as one HTML element.
   </script>
