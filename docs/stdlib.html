@@ -109,7 +109,7 @@
 
     ### dark
 
-    `true` if the page uses a dark color scheme, and `false` otherwise. It is based on the page's computed [`color-scheme`](https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme). If the notebook pairs a light and a dark theme, as in `light-dark(air, midnight)`, the value follows the reader's [preferred color scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme), and updates when that preference changes. Use it, for example, to choose chart colors.
+    `true` if the page uses a dark [color scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/color-scheme), and `false` otherwise. With a light and a dark theme, as in `light-dark(air, midnight)`, it follows the reader's [preferred color scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme). Use it, for example, to choose chart colors.
   </script>
   <script id="15" type="text/markdown" pinned="">
     The current color scheme is *${dark ? "dark" : "light"}*.
@@ -138,7 +138,7 @@
     invalidation.then(() => clearInterval(timer));
   </script>
   <script id="20" type="text/markdown">
-    The cell above counts seconds; when it runs again, the old timer is stopped.
+    The cell above counts seconds; when it runs again, the old timer is stopped. See [Invalidation](https://observablehq.com/@observablehq/invalidation) for another example.
 
     `invalidation` is provided by the [Observable Runtime](https://github.com/observablehq/runtime); each cell gets a new promise each time it runs.
 
@@ -213,7 +213,7 @@
 
     ### Generators.width(*element*, *options*)
 
-    Returns an async generator that yields the width of *element* in pixels, excluding padding and border, each time it changes. *options* are passed to [*observer*.observe](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe), where *observer* is a [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver). The built-in [`width`](#width) is the width of the `main` element (or of the `body` if there is no `main` element).
+    Returns an async generator that yields the width of *element* in pixels, excluding padding and border, each time it changes. *options* are passed to [ResizeObserver.observe](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe). The built-in [`width`](#width) is the width of the `main` element (or of the `body` if there is no `main` element).
 
     ```js
     const sidebarWidth = Generators.width(document.querySelector("#sidebar"));
@@ -234,7 +234,7 @@
 
     ### Mutable(*value*)
 
-    Returns a generator with a `value` property, initialized to *value*. Cells that reference the variable run again when `value` is assigned. Only the cell that calls `Mutable` can read or assign `value`; to let other cells change it, declare functions in that cell, and call them from other cells.
+    Returns a generator with a `value` property, initialized to *value*. Cells that reference the variable run again when `value` is assigned. Only the cell that calls `Mutable` can read or assign `value`; to let other cells change it, declare functions in that cell, and call them from other cells. See [Mutables](https://observablehq.com/@observablehq/mutables).
   </script>
   <script id="30" type="module" pinned="">
     const count = Mutable(0);
@@ -326,7 +326,7 @@
 
     Parses the file as comma-separated values with [d3-dsv](https://d3js.org/d3-dsv). *file*.tsv parses tab-separated values, and *file*.dsv uses the **delimiter** option (a comma by default). The options are:
 
-    - **array** - if true, returns an array of arrays, one per line, including the first line. Otherwise (the default), the first line is the header, each other line is an object keyed by column name, and the array has a `columns` property listing the column names.
+    - **array** - if true, returns one array per line, header included; otherwise (the default), the first line is the header, each other line becomes an object keyed by column name, and the result has a `columns` property.
     - **typed** - how to convert values, which are strings in the file:
       - false (the default) - values remain strings
       - true - values are converted with [d3.autoType](https://d3js.org/d3-dsv#autoType), row by row
