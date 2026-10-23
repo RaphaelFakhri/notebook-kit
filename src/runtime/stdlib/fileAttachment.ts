@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import {inferTypes} from "./dsv.js";
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-const files = new Map<string, FileAttachmentImpl>();
+/** A read-only map from each registered file’s resolved name href to the corresponding file.  */
+export const registeredFiles = new Map<string, FileAttachment>();
 
 export type DsvOptions = {delimiter?: string; array?: boolean; typed?: "auto" | boolean};
 export type DsvResult = (Record<string, any>[] | any[][]) & {columns: string[]};
@@ -53,13 +55,13 @@ let strict = false;
 
 export const FileAttachment = (name: string, base = document.baseURI): FileAttachment => {
   const href = new URL(name, base).href;
-  let file = files.get(href);
+  let file = registeredFiles.get(href);
   if (!file) {
     if (strict) {
       throw new Error(`File not found: ${name}`);
     } else {
       file = new FileAttachmentImpl(href, name.split("/").pop()!);
-      files.set(href, file);
+      registeredFiles.set(href, file);
     }
   }
   return file;
@@ -83,17 +85,17 @@ export function registerFile(
 ) {
   const href = new URL(name, base).href;
   if (info == null) {
-    files.delete(href);
+    registeredFiles.delete(href);
   } else {
     const {path, mimeType, lastModified, size} = info;
     const file = new FileAttachmentImpl(
       new URL(path, base).href,
-      name.split("/").pop()!,
+      name,
       mimeType,
       lastModified,
       size
     );
-    files.set(href, file);
+    registeredFiles.set(href, file);
     return file;
   }
 }

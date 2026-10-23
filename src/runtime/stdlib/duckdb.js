@@ -74,9 +74,10 @@ const mainWorkerUrl = bundle.then(({mainWorker}) => {
 // }
 
 export class DuckDBClient {
-  constructor(db) {
+  constructor(db, worker) {
     Object.defineProperties(this, {
-      _db: {value: db}
+      _db: {value: db},
+      _worker: {value: worker}
     });
   }
 
@@ -167,8 +168,21 @@ export class DuckDBClient {
     );
   }
 
+  async terminate() {
+    await this._db.terminate();
+    await this._worker.terminate();
+  }
+
+  static async from(files, config) {
+    const db = await DuckDBClient.of({}, config);
+    for (const {name, href} of files) {
+      await db._db.registerFileURL(name, new URL(href, location).href, 4); // HTTP
+    }
+    return db;
+  }
+
   static async of(sources = {}, config = {}) {
-    const db = await createDuckDB();
+    const [db, worker] = await createDuckDB();
     if (config.query?.castDecimalToDouble === undefined) {
       config = {...config, query: {...config.query, castDecimalToDouble: true}};
     }
@@ -186,7 +200,7 @@ export class DuckDBClient {
     await Promise.all(
       Object.entries(sources).map(([name, source]) => insertSource(db, name, source))
     );
-    return new DuckDBClient(db);
+    return new DuckDBClient(db, worker);
   }
 
   static sql() {
@@ -358,7 +372,7 @@ async function createDuckDB() {
   const worker = new Worker(await mainWorkerUrl);
   const db = new duckdb.AsyncDuckDB(logger, worker);
   await db.instantiate((await bundle).mainModule);
-  return db;
+  return [db, worker];
 }
 
 // https://duckdb.org/docs/sql/data_types/overview
