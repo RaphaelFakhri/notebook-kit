@@ -262,21 +262,30 @@ class FileAttachmentImpl extends AbstractFile {
 Object.defineProperty(FileAttachmentImpl, "name", {value: "FileAttachment"}); // prevent mangling
 FileAttachment.prototype = FileAttachmentImpl.prototype; // instanceof
 
-type FileResolution = {url: string; mimeType?: string; lastModified?: number; size?: number};
-type FileResolver = (name: string) => FileResolution | string | null;
+type NamedFiledResolution = FileResolution & {name: string};
+type FileResolution = ({url: string; href?: undefined} | {url?: undefined; href: string}) & {mimeType?: string; lastModified?: number; size?: number}; // prettier-ignore
+type FileResolver = (name: string) => FileResolution | string | null | undefined;
 
-export function fileAttachments(resolve: FileResolver): (name: string) => FileAttachment {
+export function fileAttachments(
+  files: FileResolver | Iterable<NamedFiledResolution>
+): (name: string) => FileAttachment {
+  const resolve = typeof files === "function" ? files : fileResolver(files);
   function FileAttachment(name: string) {
     const result = resolve((name += ""));
     if (result == null) throw new Error(`File not found: ${name}`);
-    if (typeof result === "object" && "url" in result) {
-      const {url, mimeType, lastModified, size} = result;
-      return new FileAttachmentImpl(url, name, mimeType, lastModified, size);
+    if (typeof result === "object" && ("url" in result || "href" in result)) {
+      const {url, href, mimeType, lastModified, size} = result;
+      return new FileAttachmentImpl(href ?? url, name, mimeType, lastModified, size);
     }
     return new FileAttachmentImpl(result, name);
   }
   FileAttachment.prototype = FileAttachmentImpl.prototype; // instanceof
   return FileAttachment;
+}
+
+function fileResolver(files: Iterable<NamedFiledResolution>): FileResolver {
+  const filesByName = new Map(Array.from(files, (f) => [f.name, f]));
+  return (name) => filesByName.get(name);
 }
 
 type FileRef = Pick<FileAttachment, "name" | "href">;
