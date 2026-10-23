@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {inferTypes} from "./dsv.js";
+import type {DuckDBClient} from "./duckdb.js";
 
 /** A read-only map from each registered file’s resolved name href to the corresponding file.  */
-export const registeredFiles = new Map<string, FileAttachment>();
+const registeredFiles = new Map<string, FileAttachment>();
 
 export type DsvOptions = {delimiter?: string; array?: boolean; typed?: "auto" | boolean};
 export type DsvResult = (Record<string, any>[] | any[][]) & {columns: string[]};
@@ -276,4 +277,17 @@ export function fileAttachments(resolve: FileResolver): (name: string) => FileAt
   }
   FileAttachment.prototype = FileAttachmentImpl.prototype; // instanceof
   return FileAttachment;
+}
+
+type FileRef = Pick<FileAttachment, "name" | "href">;
+
+export function fileDatabase(files: Iterable<FileRef> = registeredFiles.values()) {
+  return [
+    ["DuckDBClient", "invalidation"],
+    async (Client: typeof DuckDBClient, invalidation: Promise<void>) => {
+      const db = await Client.from(files);
+      invalidation.then(() => db.terminate());
+      return db;
+    }
+  ] as const;
 }
