@@ -290,11 +290,11 @@ function fileResolver(files: Iterable<NamedFiledResolution>): FileResolver {
 
 type FileRef = Pick<FileAttachment, "name" | "href">;
 
-export function fileDatabase(files: Iterable<FileRef> = registeredFiles.values()) {
+export function fileDatabase(files?: Iterable<FileRef>) {
   return [
     ["DuckDBClient", "invalidation"],
     async (Client: typeof DuckDBClient, invalidation: Promise<void>) => {
-      const db = await Client.from(files);
+      const db = await Client.from(files ?? registeredFiles.values());
       invalidation.then(() => db.terminate());
       return db;
     }
