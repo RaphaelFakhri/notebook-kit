@@ -78,11 +78,14 @@ export function requireFileRegistration(value: boolean) {
   strict = value;
 }
 
+export function registerFile(name: string, info: FileInfo, base?: string | URL): FileAttachment;
+export function registerFile(name: string, info: null, base?: string | URL): undefined;
+export function registerFile(name: string, info: FileInfo | null, base?: string | URL): FileAttachment | undefined; // prettier-ignore
 export function registerFile(
   name: string,
   info: FileInfo | null,
   base: string | URL = document.baseURI
-) {
+): FileAttachment | undefined {
   const href = new URL(name, base).href;
   if (info == null) {
     registeredFiles.delete(href);
