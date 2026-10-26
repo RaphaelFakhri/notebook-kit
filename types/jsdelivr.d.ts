@@ -15,6 +15,7 @@ declare module "https://cdn.jsdelivr.net/npm/mapbox-gl/+esm";
 declare module "https://cdn.jsdelivr.net/npm/mermaid/+esm";
 declare module "https://cdn.jsdelivr.net/npm/parquet-wasm/+esm";
 declare module "https://cdn.jsdelivr.net/npm/react-dom/client/+esm";
+declare module "https://cdn.jsdelivr.net/npm/react/jsx-runtime/+esm";
 declare module "https://cdn.jsdelivr.net/npm/react/+esm";
 declare module "https://cdn.jsdelivr.net/npm/topojson-client/+esm";
 declare module "https://cdn.jsdelivr.net/npm/vega-lite-api/+esm";
