@@ -41,6 +41,9 @@ function getDefaultRange(name: string): string {
       return "@1.32.0"; // https://github.com/duckdb/duckdb-wasm/issues/1994
     case "apache-arrow":
       return "@17.0.0"; // to match @duckdb/duckdb-wasm 1.32.0
+    case "react":
+    case "react-dom":
+      return "@19.3.1"; // to share a single React instance with the stdlib (and JSX display)
     default:
       return "";
   }

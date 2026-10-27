@@ -82,6 +82,13 @@ test("sets the default path for various libraries", () => {
   );
   assert.strictEqual(
     resolveNpmImport("npm:react-dom"),
-    "https://cdn.jsdelivr.net/npm/react-dom/client/+esm"
+    "https://cdn.jsdelivr.net/npm/react-dom@19.3.1/client/+esm"
   );
+});
+
+test("sets the default version of react and react-dom to match the standard library", () => {
+  assert.strictEqual(resolveNpmImport("npm:react"), "https://cdn.jsdelivr.net/npm/react@19.3.1/+esm");
+  assert.strictEqual(resolveNpmImport("npm:react/jsx-runtime"), "https://cdn.jsdelivr.net/npm/react@19.3.1/jsx-runtime/+esm"); // prettier-ignore
+  assert.strictEqual(resolveNpmImport("npm:react-dom"), "https://cdn.jsdelivr.net/npm/react-dom@19.3.1/client/+esm"); // prettier-ignore
+  assert.strictEqual(resolveNpmImport("npm:react@18"), "https://cdn.jsdelivr.net/npm/react@18/+esm");
 });
