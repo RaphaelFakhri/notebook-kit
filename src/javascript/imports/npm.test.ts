@@ -82,6 +82,6 @@ test("sets the default path for various libraries", () => {
   );
   assert.strictEqual(
     resolveNpmImport("npm:react-dom"),
-    "https://cdn.jsdelivr.net/npm/react-dom/client/+esm"
+    "https://cdn.jsdelivr.net/npm/react-dom@19.3.1/client/+esm"
   );
 });
