@@ -1,10 +1,9 @@
 import initSqlJs from "https://cdn.jsdelivr.net/npm/sql.js/+esm";
 import type {Database, SqlValue} from "sql.js";
+import type {QueryResult} from "./databaseClient.js";
 import type {FileAttachment} from "./fileAttachment.js";
 
 type DataSource = string | Uint8Array | ArrayBuffer | Response | FileAttachment;
-
-export type QueryResult = Record<string, SqlValue>[] & {columns: readonly string[]};
 
 const SQLite = initSqlJs({
   locateFile(name) {
